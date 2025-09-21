@@ -1,0 +1,42 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: david-vizena-app
+  namespace: david-vizena
+  labels:
+    app: david-vizena-app
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: david-vizena-app
+  template:
+    metadata:
+      labels:
+        app: david-vizena-app
+    spec:
+      containers:
+      - name: david-vizena-app
+        image: ghcr.io/davidvizena/k8s-ci-cd:latest
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 8080
+        resources:
+          requests:
+            memory: "32Mi"
+            cpu: "25m"
+          limits:
+            memory: "64Mi"
+            cpu: "50m"
+        livenessProbe:
+          httpGet:
+            path: /
+            port: 8080
+          initialDelaySeconds: 30
+          periodSeconds: 10
+        readinessProbe:
+          httpGet:
+            path: /
+            port: 8080
+          initialDelaySeconds: 5
+          periodSeconds: 5

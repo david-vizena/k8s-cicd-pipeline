@@ -1,0 +1,280 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: gocd
+  labels:
+    app: gocd
+    project: portfolio
+
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: gocd-server-config
+  namespace: gocd
+data:
+  cruise-config.xml: |
+    <?xml version="1.0" encoding="utf-8"?>
+    <cruise xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="cruise-config.xsd" schemaVersion="132">
+      <server artifactsdir="artifacts" commandRepositoryLocation="default" serverId="david-vizena-gocd">
+        <security>
+          <authConfigs>
+            <authConfig id="github" pluginId="cd.go.authentication.passwordfile">
+              <property>
+                <key>PasswordFilePath</key>
+                <value>/etc/go/passwd</value>
+              </property>
+            </authConfig>
+          </authConfigs>
+        </security>
+      </server>
+      
+      <pipelines group="david-vizena-portfolio">
+        <pipeline name="david-vizena-app">
+          <materials>
+            <git url="https://github.com/davidvizena/k8s-ci-cd.git" branch="k8s-ci-cd-project" />
+          </materials>
+          <stage name="build">
+            <jobs>
+              <job name="build-and-test">
+                <tasks>
+                  <exec command="/bin/bash">
+                    <arg>-c</arg>
+                    <arg>
+                      set -e
+                      echo "🔨 Building application..."
+                      npm ci
+                      npm test -- --coverage --watchAll=false
+                      npm run build
+                      echo "✅ Build completed successfully"
+                    </arg>
+                  </exec>
+                </tasks>
+                <artifacts>
+                  <artifact src="build" dest="build" />
+                </artifacts>
+              </job>
+            </jobs>
+          </stage>
+          
+          <stage name="security-scan">
+            <jobs>
+              <job name="trivy-scan">
+                <tasks>
+                  <exec command="/bin/bash">
+                    <arg>-c</arg>
+                    <arg>
+                      set -e
+                      echo "🔍 Running security scan..."
+                      docker run --rm -v /var/run/docker.sock:/var/run/docker.sock \
+                        -v $(pwd):/workspace aquasec/trivy:latest \
+                        fs /workspace --format json --output trivy-results.json
+                      echo "✅ Security scan completed"
+                    </arg>
+                  </exec>
+                </tasks>
+                <artifacts>
+                  <artifact src="trivy-results.json" dest="security" />
+                </artifacts>
+              </job>
+            </jobs>
+          </stage>
+          
+          <stage name="docker-build">
+            <jobs>
+              <job name="build-image">
+                <tasks>
+                  <exec command="/bin/bash">
+                    <arg>-c</arg>
+                    <arg>
+                      set -e
+                      echo "🐳 Building Docker image..."
+                      docker build -t davidvizena/hello-world:${GO_PIPELINE_COUNTER} .
+                      docker tag davidvizena/hello-world:${GO_PIPELINE_COUNTER} davidvizena/hello-world:latest
+                      echo "✅ Docker image built successfully"
+                    </arg>
+                  </exec>
+                </tasks>
+              </job>
+            </jobs>
+          </stage>
+          
+          <stage name="deploy-staging">
+            <jobs>
+              <job name="deploy-to-staging">
+                <tasks>
+                  <exec command="/bin/bash">
+                    <arg>-c</arg>
+                    <arg>
+                      set -e
+                      echo "🚀 Deploying to staging..."
+                      # Update image tag in deployment
+                      sed -i "s|image: davidvizena/hello-world:latest|image: davidvizena/hello-world:${GO_PIPELINE_COUNTER}|g" k8s/deployment.yaml
+                      # Apply to staging namespace
+                      kubectl apply -f k8s/ -n david-vizena-staging
+                      # Wait for deployment
+                      kubectl rollout status deployment/david-vizena-app -n david-vizena-staging --timeout=300s
+                      echo "✅ Staging deployment completed"
+                    </arg>
+                  </exec>
+                </tasks>
+              </job>
+            </jobs>
+          </stage>
+          
+          <stage name="deploy-production">
+            <jobs>
+              <job name="deploy-to-production">
+                <tasks>
+                  <exec command="/bin/bash">
+                    <arg>-c</arg>
+                    <arg>
+                      set -e
+                      echo "🚀 Deploying to production..."
+                      # Update image tag in deployment
+                      sed -i "s|image: davidvizena/hello-world:latest|image: davidvizena/hello-world:${GO_PIPELINE_COUNTER}|g" k8s/deployment.yaml
+                      # Apply to production namespace
+                      kubectl apply -f k8s/ -n david-vizena
+                      # Wait for deployment
+                      kubectl rollout status deployment/david-vizena-app -n david-vizena --timeout=300s
+                      echo "✅ Production deployment completed"
+                    </arg>
+                  </exec>
+                </tasks>
+              </job>
+            </jobs>
+          </stage>
+        </pipeline>
+      </pipelines>
+    </cruise>
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: gocd-server
+  namespace: gocd
+  labels:
+    app: gocd-server
+spec:
+  ports:
+  - port: 8153
+    targetPort: 8153
+    name: http
+  - port: 8154
+    targetPort: 8154
+    name: https
+  selector:
+    app: gocd-server
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: gocd-server
+  namespace: gocd
+  labels:
+    app: gocd-server
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: gocd-server
+  template:
+    metadata:
+      labels:
+        app: gocd-server
+    spec:
+      containers:
+      - name: gocd-server
+        image: gocd/gocd-server:v23.3.0
+        ports:
+        - containerPort: 8153
+        - containerPort: 8154
+        env:
+        - name: GO_SERVER_SYSTEM_PROPERTIES
+          value: "-Dgo.plugin.upload.enabled=true"
+        - name: GO_SERVER_JVM_OPTIONS
+          value: "-Xmx1g -Xms1g"
+        volumeMounts:
+        - name: gocd-server-config
+          mountPath: /etc/go/cruise-config.xml
+          subPath: cruise-config.xml
+        - name: gocd-server-data
+          mountPath: /go
+        resources:
+          requests:
+            memory: "512Mi"
+            cpu: "250m"
+          limits:
+            memory: "1Gi"
+            cpu: "500m"
+      volumes:
+      - name: gocd-server-config
+        configMap:
+          name: gocd-server-config
+      - name: gocd-server-data
+        emptyDir: {}
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: gocd-agent
+  namespace: gocd
+  labels:
+    app: gocd-agent
+spec:
+  ports:
+  - port: 8153
+    targetPort: 8153
+    name: http
+  selector:
+    app: gocd-agent
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: gocd-agent
+  namespace: gocd
+  labels:
+    app: gocd-agent
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: gocd-agent
+  template:
+    metadata:
+      labels:
+        app: gocd-agent
+    spec:
+      containers:
+      - name: gocd-agent
+        image: gocd/gocd-agent-docker-dind:v23.3.0
+        env:
+        - name: GO_SERVER_URL
+          value: "https://gocd-server:8154/go"
+        - name: DOCKER_HOST
+          value: "tcp://localhost:2375"
+        securityContext:
+          privileged: true
+        volumeMounts:
+        - name: docker-sock
+          mountPath: /var/run/docker.sock
+        - name: go-agent-data
+          mountPath: /go
+        resources:
+          requests:
+            memory: "256Mi"
+            cpu: "100m"
+          limits:
+            memory: "512Mi"
+            cpu: "250m"
+      volumes:
+      - name: docker-sock
+        hostPath:
+          path: /var/run/docker.sock
+      - name: go-agent-data
+        emptyDir: {}

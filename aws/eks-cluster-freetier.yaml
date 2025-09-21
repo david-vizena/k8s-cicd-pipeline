@@ -1,0 +1,68 @@
+apiVersion: eksctl.io/v1alpha5
+kind: ClusterConfig
+
+metadata:
+  name: david-vizena-freetier-cluster
+  region: us-west-2
+  version: "1.28"
+  tags:
+    Project: "Portfolio"
+    Environment: "FreeTier"
+    Owner: "David Vizena"
+
+iam:
+  withOIDC: true
+  serviceAccounts:
+  - metadata:
+      name: aws-load-balancer-controller
+      namespace: kube-system
+    wellKnownPolicies:
+      awsLoadBalancerController: true
+
+# Free-tier compatible node group
+managedNodeGroups:
+- name: freetier-nodes
+  instanceType: t3.micro  # Free tier eligible
+  desiredCapacity: 1      # Single node to minimize costs
+  minSize: 1
+  maxSize: 1              # No auto-scaling to avoid costs
+  volumeSize: 8           # Minimum size for free tier
+  volumeType: gp2         # Standard storage
+  ssh:
+    allow: true
+    publicKeyName: david-vizena-key
+  iam:
+    withAddonPolicies:
+      imageBuilder: true
+      autoScaler: false   # Disabled to avoid costs
+      externalDNS: false  # Disabled to avoid costs
+      certManager: false  # Disabled to avoid costs
+      appMesh: false
+      appMeshPreview: false
+      ebs: true
+      fsx: false
+      efs: false
+      awsLoadBalancerController: true
+      xRay: false
+      cloudWatch: true
+  labels:
+    role: main
+    environment: freetier
+  tags:
+    Project: "Portfolio"
+    Environment: "FreeTier"
+
+# Minimal addons for free tier
+addons:
+- name: vpc-cni
+  version: latest
+- name: coredns
+  version: latest
+- name: kube-proxy
+  version: latest
+
+# Disable expensive logging
+cloudWatch:
+  clusterLogging:
+    enableTypes: []  # Disable all logging to avoid costs
+    logRetentionInDays: 1

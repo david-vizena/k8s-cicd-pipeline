@@ -1,0 +1,71 @@
+apiVersion: opensearch.org/v1
+kind: OpenSearchCluster
+metadata:
+  name: david-vizena-opensearch
+  namespace: david-vizena
+  labels:
+    app: opensearch
+    project: portfolio
+spec:
+  general:
+    serviceName: david-vizena-opensearch
+    version: "2.11.0"
+    httpPort: 9200
+    securityConfig:
+      config:
+        enabled: true
+        tls:
+          transport:
+            generate: true
+          http:
+            generate: true
+    persistence:
+      persistencePolicy: "single"
+      pvc:
+        storageClassName: "gp2"
+        accessModes:
+          - ReadWriteOnce
+        size: "5Gi"
+  nodePools:
+    - component: masters
+      replicas: 1
+      diskSize: "5Gi"
+      NodeSelector:
+        node-role.kubernetes.io/master: "true"
+      resources:
+        requests:
+          memory: "512Mi"
+          cpu: "250m"
+        limits:
+          memory: "1Gi"
+          cpu: "500m"
+    - component: data
+      replicas: 1
+      diskSize: "5Gi"
+      resources:
+        requests:
+          memory: "512Mi"
+          cpu: "250m"
+        limits:
+          memory: "1Gi"
+          cpu: "500m"
+    - component: coordinators
+      replicas: 1
+      resources:
+        requests:
+          memory: "256Mi"
+          cpu: "100m"
+        limits:
+          memory: "512Mi"
+          cpu: "250m"
+  dashboards:
+    enable: true
+    replicas: 1
+    version: "2.11.0"
+    resources:
+      requests:
+        memory: "256Mi"
+        cpu: "100m"
+      limits:
+        memory: "512Mi"
+        cpu: "250m"

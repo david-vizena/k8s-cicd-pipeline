@@ -1,0 +1,75 @@
+apiVersion: eksctl.io/v1alpha5
+kind: ClusterConfig
+
+metadata:
+  name: david-vizena-production-cluster
+  region: us-west-2
+  version: "1.28"
+  tags:
+    Project: "Portfolio"
+    Environment: "Production"
+    Owner: "David Vizena"
+
+iam:
+  withOIDC: true
+  serviceAccounts:
+  - metadata:
+      name: aws-load-balancer-controller
+      namespace: kube-system
+    wellKnownPolicies:
+      awsLoadBalancerController: true
+  - metadata:
+      name: external-dns
+      namespace: kube-system
+    wellKnownPolicies:
+      externalDNS: true
+
+managedNodeGroups:
+- name: main-nodes
+  instanceType: t3.micro
+  desiredCapacity: 1
+  minSize: 1
+  maxSize: 2
+  volumeSize: 8
+  volumeType: gp2
+  ssh:
+    allow: true
+    publicKeyName: david-vizena-key
+  iam:
+    withAddonPolicies:
+      imageBuilder: true
+      autoScaler: true
+      externalDNS: true
+      certManager: true
+      appMesh: true
+      appMeshPreview: true
+      ebs: true
+      fsx: true
+      efs: true
+      awsLoadBalancerController: true
+      xRay: true
+      cloudWatch: true
+  labels:
+    role: main
+    environment: production
+  tags:
+    Project: "Portfolio"
+    Environment: "Production"
+
+addons:
+- name: vpc-cni
+  version: latest
+- name: coredns
+  version: latest
+- name: kube-proxy
+  version: latest
+- name: aws-ebs-csi-driver
+  version: latest
+
+cloudWatch:
+  clusterLogging:
+    enableTypes: ["*"]
+    logRetentionInDays: 7
+
+secretsEncryption:
+  keyARN: arn:aws:kms:us-west-2:ACCOUNT_ID:key/KEY_ID
