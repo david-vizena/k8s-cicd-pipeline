@@ -1,13 +1,15 @@
 {
-  "name": "david-vizena-hello-world",
+  "name": "david-vizena-cicd-portfolio",
   "version": "1.0.0",
-  "description": "A simple Hello World app showcasing David Vizena",
+  "description": "CI/CD Pipeline Portfolio Project - React, Kubernetes, ArgoCD, GoCD",
   "main": "index.js",
   "scripts": {
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
-    "eject": "react-scripts eject"
+    "eject": "react-scripts eject",
+    "lint": "eslint src/",
+    "lint:fix": "eslint src/ --fix"
   },
   "dependencies": {
     "react": "^18.2.0",

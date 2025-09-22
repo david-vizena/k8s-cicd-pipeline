@@ -17,7 +17,7 @@ spec:
     spec:
       containers:
       - name: david-vizena-app
-        image: ghcr.io/davidvizena/k8s-ci-cd:latest
+        image: davidvizena/cicd-portfolio:latest
         imagePullPolicy: Always
         ports:
         - containerPort: 8080

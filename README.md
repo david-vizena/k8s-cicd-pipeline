@@ -1,6 +1,6 @@
 # David Vizena - CI/CD Pipeline Portfolio Project
 
-A comprehensive CI/CD pipeline showcasing modern DevOps practices with React, Kubernetes, ArgoCD, OpenSearch, and AWS EKS. This project demonstrates GitOps, automated testing, security scanning, and cloud-native deployment strategies.
+A comprehensive CI/CD pipeline showcasing modern DevOps practices with React, Kubernetes, GitHub Actions, and AWS EKS. This project demonstrates automated testing, containerization, and cloud-native deployment strategies optimized for free-tier hosting.
 
 ## 🚀 Features
 
@@ -10,10 +10,10 @@ A comprehensive CI/CD pipeline showcasing modern DevOps practices with React, Ku
 - **Kubernetes Deployment**: Scalable deployment with network policies
 
 ### CI/CD Pipeline
-- **GitHub Actions**: Automated build, test, and deployment pipeline
-- **Security Scanning**: Trivy vulnerability scanning integrated
-- **Multi-Environment**: Staging and production deployment strategies
-- **GitOps**: ArgoCD for declarative application management
+- **GitHub Actions**: Industry-standard CI/CD with automated pipelines
+- **Automated Testing**: Unit tests, linting, and build validation
+- **Docker Packaging**: Multi-stage container builds for production
+- **Container Registry**: GitHub Container Registry for image storage
 
 ### Observability & Monitoring
 - **OpenSearch**: Centralized logging and search capabilities
@@ -29,20 +29,24 @@ A comprehensive CI/CD pipeline showcasing modern DevOps practices with React, Ku
 ## 🌐 Live Demo
 
 **Production Application**: [david-vizena-portfolio.com](https://david-vizena-portfolio.com) (coming soon)
-**ArgoCD Dashboard**: [argocd.david-vizena-portfolio.com](https://argocd.david-vizena-portfolio.com) (coming soon)
+**GitHub Actions**: [View CI/CD Pipeline](https://github.com/david-vizena/k8s-cicd-pipeline/actions) (live)
+**Container Registry**: [View Docker Images](https://github.com/david-vizena/k8s-cicd-pipeline/pkgs/container/k8s-cicd-pipeline) (live)
 
 **CI/CD Pipeline Features**:
-- **Automated Testing**: Unit tests, linting, and security scanning
-- **Multi-Stage Deployment**: Staging → Production with approval gates
-- **GitOps Workflow**: ArgoCD syncs desired state from Git repository
-- **Observability**: Centralized logging with OpenSearch and metrics with Prometheus
+- **Automated Testing**: Unit tests, linting, and build validation
+- **Containerization**: Docker multi-stage builds for production
+- **GitHub Actions**: Industry-standard CI/CD with automatic triggers
+- **Free-Tier Optimized**: AWS EKS deployment with minimal resource usage
 
 ## 🛠️ Tech Stack
 
 - **Frontend**: React 18, Tailwind CSS
 - **Containerization**: Docker, Nginx
 - **Orchestration**: Kubernetes
-- **Networking**: Network Policies, LoadBalancer Service
+- **CI/CD**: GitHub Actions
+- **Cloud**: AWS EKS
+- **Observability**: OpenSearch, Fluent Bit, Prometheus, Grafana
+- **Version Control**: Git, GitHub
 
 ## 📦 Quick Start (100% Free Options)
 
@@ -180,7 +184,10 @@ cd k8s-ci-cd
 │   ├── namespace.yaml  # Kubernetes namespace
 │   ├── deployment.yaml # App deployment
 │   ├── service.yaml    # LoadBalancer service
+│   ├── ingress.yaml    # Ingress configuration
 │   └── network-policy.yaml # Network policies
+├── .github/workflows/
+│   └── ci-cd.yml       # GitHub Actions CI/CD pipeline
 ├── Dockerfile          # Multi-stage Docker build
 ├── nginx.conf          # Nginx configuration
 └── deploy.sh           # Deployment script
@@ -214,11 +221,10 @@ This is **Project 1** of a 4-project portfolio series demonstrating full-stack D
 - 🔄 Log Aggregation
 
 ### **Project 3: CI/CD & GitOps** (Current)
-- ✅ GitHub Actions Pipeline
-- ✅ ArgoCD GitOps Deployment
-- ✅ OpenSearch Logging
-- ✅ Security Scanning (Trivy)
-- ✅ Multi-Environment Deployment
+- ✅ GitHub Actions Pipeline Automation
+- ✅ Docker Containerization
+- ✅ Kubernetes Orchestration
+- ✅ AWS EKS Deployment
 - ✅ 100% Free-Tier Compatible
 
 ### **Project 4: Security & Secrets Management** (Coming Soon)
@@ -234,4 +240,15 @@ MIT License - feel free to use this as a template for your own portfolio project
 ---
 
 **Built with ❤️ by David Vizena**
-# Test update
+
+---
+
+## 📞 Contact
+
+**David Vizena**  
+DevOps Engineer | Cloud Architect  
+📧 davidvizena@gmail.com  
+🔗 [GitHub](https://github.com/david-vizena)  
+🌐 [Portfolio](https://david-vizena-portfolio.com)
+
+*This project demonstrates professional DevOps practices and is optimized for free-tier cloud hosting.*
