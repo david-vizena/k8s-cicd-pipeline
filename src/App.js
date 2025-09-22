@@ -13,7 +13,7 @@ function App() {
           </h2>
           <p className="text-xl text-gray-600 mb-8">
             Welcome to my CI/CD Pipeline Portfolio! This application demonstrates modern DevOps practices
-            including automated testing, containerization, Kubernetes orchestration, and GitOps workflows.
+            including automated testing, containerization, Kubernetes orchestration, and GitHub Actions CI/CD.
           </p>
           <div className="flex flex-wrap justify-center gap-3 mb-8">
             <div className="bg-blue-100 text-blue-800 px-4 py-2 rounded-full text-sm font-medium">
