@@ -16,9 +16,8 @@ A comprehensive CI/CD pipeline showcasing modern DevOps practices with React, Ku
 - **Container Registry**: GitHub Container Registry for image storage
 
 ### Observability & Monitoring
-- **OpenSearch**: Centralized logging and search capabilities
-- **Fluent Bit**: Log collection and forwarding
-- **Prometheus & Grafana**: Metrics collection and visualization
+- **Prometheus & Grafana**: Metrics collection and visualization (coming soon)
+- **Centralized Logging**: Structured logging for debugging and monitoring
 
 ### Cloud Infrastructure
 - **AWS EKS**: Managed Kubernetes cluster (free tier)
@@ -45,7 +44,7 @@ A comprehensive CI/CD pipeline showcasing modern DevOps practices with React, Ku
 - **Orchestration**: Kubernetes
 - **CI/CD**: GitHub Actions
 - **Cloud**: AWS EKS
-- **Observability**: OpenSearch, Fluent Bit, Prometheus, Grafana
+- **Observability**: Prometheus, Grafana (coming soon)
 - **Version Control**: Git, GitHub
 
 ## 📦 Quick Start (100% Free Options)
@@ -140,8 +139,7 @@ cd k8s-ci-cd
 ### Local Development (100% Free)
 - **Minikube**: Local Kubernetes cluster
 - **Docker**: Container runtime
-- **ArgoCD**: GitOps locally
-- **Prometheus/Grafana**: Monitoring stack
+- **GitHub Actions**: CI/CD pipeline
 - **No cloud costs**: Everything runs on your machine
 
 ### Cloud Free Tiers
