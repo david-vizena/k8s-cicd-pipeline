@@ -29,10 +29,10 @@ function App() {
               Kubernetes
             </div>
             <div className="bg-red-100 text-red-800 px-4 py-2 rounded-full text-sm font-medium">
-              GoCD
+              GitHub Actions
             </div>
             <div className="bg-indigo-100 text-indigo-800 px-4 py-2 rounded-full text-sm font-medium">
-              ArgoCD
+              CI/CD Pipeline
             </div>
             <div className="bg-yellow-100 text-yellow-800 px-4 py-2 rounded-full text-sm font-medium">
               AWS EKS
@@ -44,7 +44,7 @@ function App() {
               <li>✅ Automated testing with npm test</li>
               <li>✅ Docker containerization with multi-stage builds</li>
               <li>✅ Kubernetes deployment with health checks</li>
-              <li>✅ GitOps workflow with ArgoCD</li>
+              <li>✅ GitHub Actions CI/CD automation</li>
               <li>✅ Free-tier optimized for AWS EKS</li>
             </ul>
           </div>
